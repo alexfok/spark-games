@@ -1,0 +1,53 @@
+#####################################################
+# Data Frames Usage Examples
+from pyspark.sql import SQLContext
+from pyspark.sql.types import Row, StructField, StructType, StringType, IntegerType
+from pyspark.sql.functions import explode
+import os
+import re
+import collections
+
+
+input_folder_hadoop = "hdfs://172.23.92.97/user/mapr/cp_in/json"
+output_folder_hadoop = "hdfs://172.23.92.97/user/mapr/cp_out/"
+
+
+def my_print(a):
+    print (a)
+
+
+def add_json_to_hadoop(json_dict, filename, table_name):
+    print("Start parquet queries " + table_name)
+    with open(os.path.join(input_folder_hadoop, filename), 'r') as f:
+        json_dict[table_name] += f.read() + "\n"
+    #df = sqlContext.read.json(os.path.join(input_folder_hadoop, filename))
+    #df.write.mode('append').partitionBy('id').parquet(os.path.join(output_folder_hadoop, table_name))
+    #df.write.mode('append').parquet(os.path.join(output_folder_hadoop, table_name))
+
+
+def loop_on_dir(sql_context, dir_path):
+    json_dict = collections.defaultdict(str)
+    json_regex = re.compile(r'(\D+)_\d+\.json')
+    for filename in os.listdir(dir_path):
+        m = json_regex.match(filename)
+        if m:
+            print (m.group(1))
+            add_json_to_hadoop(json_dict, os.path.join(dir_path, filename), m.group(1))
+
+    for key, value in json_dict.items():
+        print ("working on " + key)
+        with open(os.path.join(dir_path, key), 'w+') as f:
+            f.write(value)
+
+        df = sqlContext.read.json(os.path.join(dir_path, key))
+        # df.write.mode('append').partitionBy('id').parquet(os.path.join(output_folder_hadoop, table_name))
+        df.write.mode('append').parquet(os.path.join(output_folder_hadoop, key))
+
+# Define schema
+schemaString = "attributes keyname tag text"
+fields = [StructField(field_name, StringType(), True) for field_name in schemaString.split()]
+schema = StructType(fields)
+
+sqlContext = SQLContext(sc)
+
+loop_on_dir(sc, "/user/mapr/cp_in/json")
