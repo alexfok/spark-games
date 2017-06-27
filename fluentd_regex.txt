@@ -1,0 +1,26 @@
+## cpdiag_files_feeder
+<source>
+  @type tail
+  @id cpdiag_files_feeder
+  format grok
+  <grok>
+    pattern \A\[%{DATESTAMP:my_event_time}\]\[%{INT:thid:integer}\]\[%{LOGLEVEL:log_level}\]\[%{DATA:src_file}\] PAGE_END: %{DATA} ,done_files_numb=%{INT:done_files_numb_p:integer}
+  </grok>
+  <grok>
+    pattern \A\[%{DATESTAMP:my_event_time}\]\[%{INT:thid:integer}\]\[%{LOGLEVEL:log_level}\]\[%{DATA:src_file}\] END1: found_files_numb=%{INT:found_files_numb_e:integer} ,file_chunks=%{INT:file_chunks_e:integer} ,done_files_numb=%{INT:done_files_numb_e:integer} ,bad_files_numb=%{INT:bad_files_numb_e:integer} process_time=%{BASE10NUM:process_time_e:float}
+  </grok>
+  <grok>
+    pattern \A\[%{DATESTAMP:my_event_time}\]\[%{INT:thid:integer}\]\[%{LOGLEVEL:log_level}\]\[%{DATA:src_file}\]%{GREEDYDATA:message}
+  </grok>
+  <grok>
+    pattern %{GREEDYDATA:message}
+  </grok>
+  time_format "%{MONTH}/%{YEAR}/%{DAY}%{SPACE}%{TIME}"
+  time_key my_event_time
+  keep_time_key true
+  custom_pattern_path /opt/mapr/fluentd/fluentd-0.14.00/etc/fluentd/grok_patterns
+  path /var/log/cpdiag/cpdiag_crunch_job.log
+  tag cpdiag_files_feeder
+  pos_file /opt/mapr/fluentd/fluentd-0.14.00/var/log/fluentd/tmp/cpdiag_files_feeder.pos
+</source>
+#
