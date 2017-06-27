@@ -1,0 +1,58 @@
+{
+  "type": "file",
+  "enabled": true,
+  "connection": "hdfs:///",
+  "config": null,
+  "workspaces": {
+    "root": {
+      "location": "/user/mapr/cp_out/current",
+      "writable": true,
+      "defaultInputFormat": "parquet"
+    },
+    "tmp": {
+      "location": "/user/mapr/cp_out/tmp",
+      "writable": true,
+      "defaultInputFormat": "csv"
+    },
+    "csvOut": {
+      "location": "/user/mapr/cp_out/csv",
+      "writable": true,
+      "defaultInputFormat": "csv"
+    }
+  },
+  "formats": {
+    "psv": {
+      "type": "text",
+      "extensions": [
+        "tbl"
+      ],
+      "delimiter": "|"
+    },
+    "csv": {
+      "type": "text",
+      "extensions": [
+        "csv"
+      ],
+      "delimiter": ","
+    },
+    "tsv": {
+      "type": "text",
+      "extensions": [
+        "tsv"
+      ],
+      "delimiter": "\t"
+    },
+    "parquet": {
+      "type": "parquet"
+    },
+    "json": {
+      "type": "json",
+      "extensions": [
+        "json"
+      ]
+    },
+    "maprdb": {
+      "type": "maprdb"
+    }
+  }
+}
